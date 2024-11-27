@@ -1,15 +1,17 @@
 import yaml
+import os
+import os.path
 
-# very rough prototype
-# purpose:
-# take triage/cve context data from a yaml file and insert it into the glvd db
+dist_id_mapping = {
+    'today': 14
+}
+
 
 def main():
-    items = yaml.load(open('sample.yaml'), Loader=yaml.FullLoader)
-
-    dist_id_mapping = {
-        'today': 14
-    }
+    file = f"/data/{os.environ['GLVD_TRIAGE_FILE']}"
+    if not os.path.isfile(file):
+        raise Exception(f"{file} is not a file")
+    items = yaml.load(open(file), Loader=yaml.FullLoader)
 
     for item in items:
         dists = item['dists']

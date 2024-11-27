@@ -6,7 +6,9 @@ ENV PGDATABASE glvd
 ENV PGUSER glvd
 ENV PGPASSWORD glvd
 
-RUN apt-get update && apt-get install -y postgresql-client curl python3-yaml
+ENV GLVD_TRIAGE_FILE sample.yaml
+
+RUN apt-get update && apt-get install -y postgresql-client curl python3-yaml git
 
 COPY cli.py /cli.py
 COPY entrypoint.sh /entrypoint.sh

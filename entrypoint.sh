@@ -3,7 +3,7 @@
 echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" > ~/.pgpass
 chmod 0600 ~/.pgpass
 
-wcurl https://raw.githubusercontent.com/gardenlinux/glvd-triage-data/refs/heads/main/sample.yaml
+git clone --depth=1 https://github.com/gardenlinux/glvd-triage-data /data/
 
 python3 /cli.py > /triage.sql
 
