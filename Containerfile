@@ -7,6 +7,7 @@ ENV PGUSER glvd
 ENV PGPASSWORD glvd
 
 ENV GLVD_TRIAGE_FILE sample.yaml
+ENV PAT YOUR_PAT
 
 RUN apt-get update && apt-get install -y postgresql-client curl python3-yaml git
 
