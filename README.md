@@ -4,8 +4,12 @@ Utility to add CVE context information to GLVD.
 
 Data is maintained [here](https://github.com/gardenlinux/glvd-triage-data) in yaml files.
 
-Example usage:
+## usage:
 
-```
-kubectl run glvd-triage-$(date +%s) --image=ghcr.io/gardenlinux/triage:latest --restart=Never --env=PGHOST=glvd-database-0.glvd-database --env=PGPASSWORD=$(kubectl get secret/postgres-credentials --template="{{.data.password}}" | base64 -d) --env=GLVD_TRIAGE_FILE=sample.yaml --env=PAT=YOUR_PAT
+Download the [glvd-triage.sh script](https://raw.githubusercontent.com/gardenlinux/glvd-triage-cli/refs/heads/main/glvd-triage.sh), for example like this:
+
+```bash
+mkdir -p ~/bin
+wget --output-document ~/bin/glvd-triage https://raw.githubusercontent.com/gardenlinux/glvd-triage-cli/refs/heads/main/glvd-triage.sh
+chmod +x ~/bin/glvd-triage
 ```

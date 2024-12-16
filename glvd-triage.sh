@@ -2,14 +2,19 @@
 set -o nounset
 set -o errexit
 
-# Script to apply new triage data to the glvd database
-# This script requires access to the `glvd` gardener cluster via kubectl
-
 SCRIPT_NAME="${0##*/}"
 readonly SCRIPT_NAME
 
 usage() {
+    echo "Script to apply new triage data to the glvd database"
+    echo ""
+    echo "Requirements:"
+    echo "  - This script requires access to the 'glvd' gardener cluster via kubectl"
+    echo "    Be sure to set the KUBECONFIG environment variable accordingly."
+    echo "  - This script requires a github personal access token with read access to https://github.com/gardenlinux/glvd-triage-data"
+    echo ""
     echo "Usage: $SCRIPT_NAME my-triage-file.yaml my-github-pat"
+    echo ""
     exit 1
 }
 
@@ -19,6 +24,10 @@ main() {
     [[ -n "$2" ]] || usage
     local triage_file="${1}"; shift
     local github_pat="${1}"; shift
+
+    echo "Test if glvd-database-0 exists"
+    echo "We need this, be sure you have the correct kubeconfig set"
+    kubectl get pods glvd-database-0 || usage
 
     local now
     now="$(date +%s)"
@@ -32,5 +41,5 @@ main() {
      --env=PAT="$github_pat"
 }
 
+[[ $# -ge 2 ]] || usage
 main "${@}"
-
