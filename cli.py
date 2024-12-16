@@ -23,7 +23,8 @@ def main():
                 descriptor = item.get('descriptor', 'GARDENER')
                 description = item.get('description', 'not provided')
                 is_resolved = str(item.get('is_resolved', 'false')).lower()
-                stmt = f"INSERT INTO public.cve_context (dist_id, cve_id, context_descriptor, description, is_resolved) VALUES('{dist_id}', '{cve}', '{descriptor}', '{description}', {is_resolved});"
+                score_override = item.get('score_override', 'NULL')
+                stmt = f"INSERT INTO public.cve_context (dist_id, cve_id, context_descriptor, score_override, description, is_resolved) VALUES('{dist_id}', '{cve}', '{descriptor}', {score_override}, '{description}', {is_resolved});"
 
                 print(stmt)
 

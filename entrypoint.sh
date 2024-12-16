@@ -11,3 +11,5 @@ ls -l /triage.sql
 cat /triage.sql
 
 psql glvd -f /triage.sql
+
+psql -c "select * from public.cve_context where create_date > now() - interval '1 day';" glvd
