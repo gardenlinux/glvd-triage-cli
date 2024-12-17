@@ -22,3 +22,7 @@
   description: |
     This was already patched in https://github.com/gardenlinux/package-libxml2/releases/tag/2.12.7%2Bdfsg-3gardenlinux0.
 
+    This is a multi line string, it may use *Markdown*.
+
+    There may be empty lines, but make sure the multi line string is properly formatted.
+    See https://yaml-multiline.info for syntax info.

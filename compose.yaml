@@ -19,32 +19,46 @@ services:
       start_period: 30s
       timeout: 10s
 
-# fixme(fwilhe): depends_on does not seem to work with podman compose?
+  glvd-init:
+    image: ghcr.io/gardenlinux/glvd-init:latest
+    networks:
+      - glvd-triage-IT
+    depends_on:
+      glvd-postgres:
+        condition: service_healthy
+        restart: false
+    environment:
+      PGHOST: glvd-postgres
 
-  # glvd-init:
-  #   image: ghcr.io/gardenlinux/glvd-init:latest
-  #   networks:
-  #     - glvd-triage-IT
-  #   depends_on:
-  #     glvd-postgres:
-  #       condition: service_healthy
-  #       restart: false
-  #   environment:
-  #     PGHOST: glvd-postgres
+  glvd-triage:
+    build:
+      dockerfile: ./Containerfile
+    networks:
+      - glvd-triage-IT
+    depends_on:
+      glvd-init:
+        condition: service_completed_successfully
+        restart: false
+    environment:
+      PGHOST: glvd-postgres
+    secrets:
+      - github_pat
 
-  # glvd-triage:
-  #   build:
-  #     dockerfile: ./Containerfile
-  #   networks:
-  #     - glvd-triage-IT
-  #   depends_on:
-  #     glvd-init:
-  #       condition: service_completed_successfully
-  #       restart: false
-  #   environment:
-  #     PGHOST: glvd-postgres
-  #     PAT: TODO
-
+  glvd-triage-assert:
+    build:
+      dockerfile: ./asserts.Containerfile
+    networks:
+      - glvd-triage-IT
+    depends_on:
+      glvd-triage:
+        condition: service_completed_successfully
+        restart: false
+    environment:
+      PGHOST: glvd-postgres
 
 networks:
   glvd-triage-IT: {}
+
+secrets:
+  github_pat:
+    file: github-pat.txt
