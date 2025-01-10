@@ -3,7 +3,8 @@ import os
 import os.path
 
 dist_id_mapping = {
-    'today': 14
+    'today': 14,
+    '1592.4': 15
 }
 
 
