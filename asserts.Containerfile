@@ -1,4 +1,4 @@
-FROM debian:trixie
+FROM docker.io/library/debian:trixie
 
 ENV PGHOST glvd
 ENV PGPORT 5432
