@@ -12,7 +12,6 @@ if [[ $PAT == "NOT_SET" ]]; then
     fi
 fi
 
-
 git clone --depth=1 https://"$PAT"@github.com/gardenlinux/glvd-triage-data /data/
 
 python3 /cli.py > /triage.sql
