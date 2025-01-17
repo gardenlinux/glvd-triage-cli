@@ -12,6 +12,7 @@ ENV PAT NOT_SET
 
 RUN apt-get update && apt-get install -y postgresql-client curl python3-yaml git
 
+COPY dist_cpe.json /dist_cpe.json
 COPY cli.py /cli.py
 COPY entrypoint.sh /entrypoint.sh
 
