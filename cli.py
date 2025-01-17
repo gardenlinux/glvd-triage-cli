@@ -1,14 +1,15 @@
 import yaml
+import json
 import os
 import os.path
 
-dist_id_mapping = {
-    'today': 14,
-    '1592.4': 15
-}
+dist_id_mapping = {}
 
 
 def main():
+    with open('dist_cpe.json') as dist:
+        dist_id_mapping = json.loads(dist.read())
+
     file = f"/data/{os.environ['GLVD_TRIAGE_FILE']}"
     if not os.path.isfile(file):
         raise Exception(f"{file} is not a file")
