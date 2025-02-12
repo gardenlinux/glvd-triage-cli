@@ -7,7 +7,7 @@ dist_id_mapping = {}
 
 
 def main():
-    with open('dist_cpe.json') as dist:
+    with open('/dist_cpe.json') as dist:
         dist_id_mapping = json.loads(dist.read())
 
     file = f"/data/{os.environ['GLVD_TRIAGE_FILE']}"
