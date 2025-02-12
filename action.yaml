@@ -1,0 +1,19 @@
+name: 'GLVD Triage'
+description: 'Apply CVE contexts to a GLVD database'
+branding:
+  icon: command
+  color: gray-dark
+inputs:
+  triage_file:
+    description: 'The triage file to apply'
+    required: true
+outputs:
+  result:
+    description: "todo"
+runs:
+  using: 'docker'
+  image: 'Containerfile'
+  env:
+    GLVD_TRIAGE_FILE: ${{ inputs.triage_file }}
+    PAT: ${{ secrets.GITHUB_TOKEN }}
+
