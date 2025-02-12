@@ -7,6 +7,9 @@ inputs:
   triage_file:
     description: 'The triage file to apply'
     required: true
+  pat:
+    description: ''
+    required: true
 outputs:
   result:
     description: "todo"
@@ -15,5 +18,5 @@ runs:
   image: 'Containerfile'
   env:
     GLVD_TRIAGE_FILE: ${{ inputs.triage_file }}
-    PAT: ${{ secrets.GITHUB_TOKEN }}
+    PAT: ${{ inputs.pat }}
 
