@@ -10,13 +10,17 @@ inputs:
   pat:
     description: ''
     required: true
-outputs:
-  result:
-    description: "todo"
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
-  env:
-    GLVD_TRIAGE_FILE: ${{ inputs.triage_file }}
-    PAT: ${{ inputs.pat }}
+  using: "composite"
+  steps:
+    - name: Set Greeting
+      run: podman build -t glvd-triage .
+      shell: bash
+
+    - name: Set Greeting
+      run: podman run glvd-triage
+      shell: bash
+      env:
+        GLVD_TRIAGE_FILE: ${{ inputs.triage_file }}
+        PAT: ${{ inputs.pat }}
 
