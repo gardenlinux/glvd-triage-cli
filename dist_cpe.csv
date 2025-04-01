@@ -15,3 +15,6 @@ id,cpe_vendor,cpe_product,cpe_version,deb_codename
 14,sap,gardenlinux,today,today
 15,sap,gardenlinux,1592.4,1592.4
 16,sap,gardenlinux,1592.5,1592.5
+17,sap,gardenlinux,1592.6,1592.6
+18,sap,gardenlinux,1592.7,1592.7
+19,sap,gardenlinux,1592.8,1592.8
