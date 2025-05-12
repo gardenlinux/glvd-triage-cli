@@ -1,0 +1,45 @@
+# This file only contains sample values
+- format: v1alpha1
+  cves:
+    - CVE-2024-10979
+  dists:
+    - today
+  is_resolved: false
+  descriptor: GARDENER
+  score_override: 3.2
+  name: 'postgresql'
+  reason: 'patched'
+  triaged: true
+  version: '9.6.22'
+  gl_version: '9.6.22-gl1+foobar'
+  ignored: false
+  scope: Group
+  description: |
+    This CVE only affects the postgresql server component which is not part of Garden Linux.
+
+    This is a multi line string, it may use *Markdown*.
+
+    There may be empty lines, but make sure the multi line string is properly formatted.
+    See https://yaml-multiline.info for syntax info.
+
+- format: v1alpha1
+  cves:
+    - CVE-2024-10977
+  dists:
+    - today
+  is_resolved: false
+  triaged: false
+  description: |
+    This CVE only affects the postgresql server component which is not part of Garden Linux.
+
+    This is a multi line string, it may use *Markdown*.
+
+    There may be empty lines, but make sure the multi line string is properly formatted.
+    See https://yaml-multiline.info for syntax info.
+
+- format: v1alpha1
+  cves:
+    - CVE-2024-10978
+    - CVE-2024-53051
+  dists:
+    - today
