@@ -1,5 +1,3 @@
-# integration test file, to be used via test.sh
-
 services:
   glvd-postgres:
     image: ghcr.io/gardenlinux/glvd-postgres:latest
@@ -26,32 +24,31 @@ services:
     depends_on:
       glvd-postgres:
         condition: service_healthy
-        restart: false
     environment:
       PGHOST: glvd-postgres
 
   glvd-triage-assert-pre:
     build:
-      dockerfile: ./asserts.Containerfile
+      context: ../../
+      dockerfile: tests/integration/asserts.Containerfile
     networks:
       - glvd-triage-IT
     depends_on:
       glvd-init:
         condition: service_completed_successfully
-        restart: false
     environment:
       PGHOST: glvd-postgres
     command: pre
 
   glvd-triage:
     build:
-      dockerfile: ./Containerfile
+      context: ../../
+      dockerfile: src/Containerfile
     networks:
       - glvd-triage-IT
     depends_on:
       glvd-triage-assert-pre:
         condition: service_completed_successfully
-        restart: false
     environment:
       PGHOST: glvd-postgres
       GLVD_TRIAGE_FILE: 2025-01-10.yaml
@@ -60,13 +57,13 @@ services:
 
   glvd-triage-assert:
     build:
-      dockerfile: ./asserts.Containerfile
+      context: ../../
+      dockerfile: tests/integration/asserts.Containerfile
     networks:
       - glvd-triage-IT
     depends_on:
       glvd-triage:
         condition: service_completed_successfully
-        restart: false
     environment:
       PGHOST: glvd-postgres
     command: post
@@ -76,4 +73,4 @@ networks:
 
 secrets:
   github_pat:
-    file: github-pat.txt
+    file: ../../github-pat.txt

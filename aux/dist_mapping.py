@@ -12,5 +12,5 @@ with open('dist_cpe.csv', newline='') as dist_mapping:
         if dist_name == 'gardenlinux':
             mapping[dist_version] = dist_id
 
-with open('dist_cpe.json', 'w+') as dist_mapping_json:
+with open('../src/dist_cpe.json', 'w+') as dist_mapping_json:
     dist_mapping_json.write(json.dumps(mapping))

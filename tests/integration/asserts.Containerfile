@@ -8,6 +8,6 @@ ENV PGPASSWORD glvd
 
 RUN apt-get update && apt-get install -y postgresql-client
 
-COPY asserts-entrypoint.sh /entrypoint.sh
+COPY tests/integration/asserts-entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
