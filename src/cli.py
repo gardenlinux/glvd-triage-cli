@@ -44,7 +44,7 @@ def parse_yaml(file_path):
             raise ValueError("Each entry in the YAML file must be a dictionary.")
 
         # Validate required fields
-        for required_field in ["format", "cves", "dists"]:
+        for required_field in ["revision", "cves", "dists"]:
             if required_field not in entry:
                 raise ValueError(f"Missing required field: {required_field}")
 
@@ -53,8 +53,8 @@ def parse_yaml(file_path):
         parsed_entry.update({key: entry[key] for key in entry if key not in DEFAULTS})
 
         # Validate specific fields
-        if parsed_entry["format"] != "v1alpha1":
-            raise ValueError(f"Unsupported format: {parsed_entry['format']}")
+        if parsed_entry["revision"] != "v1":
+            raise ValueError(f"Unsupported revision: {parsed_entry['revision']}")
         if not isinstance(parsed_entry["cves"], list) or not all(isinstance(cve, str) for cve in parsed_entry["cves"]):
             raise ValueError("The 'cves' field must be a list of strings.")
         if not isinstance(parsed_entry["dists"], list) or not all(isinstance(dist, str) for dist in parsed_entry["dists"]):

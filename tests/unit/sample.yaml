@@ -1,45 +1,161 @@
-# This file only contains sample values
-- format: v1alpha1
+- revision: v1
   cves:
-    - CVE-2024-10979
+    - CVE-2024-12345
   dists:
-    - today
+    - '1592.10'
   is_resolved: false
-  descriptor: GARDENER
-  score_override: 3.2
-  name: 'postgresql'
-  reason: 'patched'
-  triaged: true
-  version: '9.6.22'
-  gl_version: '9.6.22-gl1+foobar'
-  ignored: false
-  scope: Group
-  description: |
-    This CVE only affects the postgresql server component which is not part of Garden Linux.
+  triaged: false
 
-    This is a multi line string, it may use *Markdown*.
-
-    There may be empty lines, but make sure the multi line string is properly formatted.
-    See https://yaml-multiline.info for syntax info.
-
-- format: v1alpha1
+- revision: v1
   cves:
-    - CVE-2024-10977
+    - CVE-2024-23456
   dists:
-    - today
+    - '1592.10'
+    - '1592.11'
+  is_resolved: true
+  triaged: true
+  description: |
+    Patched in version 5.10.0-25. See Debian security tracker for details.
+  use-case: container
+  score_override: 5.2
+  patch: https://salsa.debian.org/kernel-team/linux/-/commit/abc123
+  patched_version: '5.10.0-25'
+
+- revision: v1
+  cves:
+    - CVE-2024-34567
+  dists:
+    - '1592.10'
+  is_resolved: false
+  triaged: true
+  description: |
+    False positive: This CVE affects the PostgreSQL server, which is not included in this image.
+  use-case: container
+  ignored: true
+
+- revision: v1
+  cves:
+    - CVE-2024-45678
+    - CVE-2024-45679
+  dists:
+    - '1592.10'
+  is_resolved: false
+  triaged: false
+
+- revision: v1
+  cves:
+    - CVE-2024-56789
+  dists:
+    - '1592.10'
+    - '1592.11'
+  is_resolved: false
+  triaged: true
+  description: |
+    Perl vulnerability, mitigated by container isolation.
+  use-case: container
+  score_override: 3.1
+
+- revision: v1
+  cves:
+    - CVE-2024-67890
+  dists:
+    - '1592.10'
+  is_resolved: true
+  triaged: true
+  description: |
+    Kernel patched in 1592.10.
+  use-case: kernel
+  patch: https://salsa.debian.org/kernel-team/linux/-/commit/def456
+  patched_version: '6.6.67-1gl0'
+
+- revision: v1
+  cves:
+    - CVE-2024-78901
+  dists:
+    - '1592.10'
+  is_resolved: false
+  triaged: false
+
+- revision: v1
+  cves:
+    - CVE-2024-89012
+  dists:
+    - '1592.10'
+  is_resolved: false
+  triaged: true
+  description: |
+    Perl module CVE, not loaded in this container image.
+  use-case: container
+  ignored: true
+
+- revision: v1
+  cves:
+    - CVE-2024-90123
+  dists:
+    - '1592.10'
+    - '1592.11'
+  is_resolved: false
+  triaged: true
+  description: |
+    Kernel CVE, not exploitable in containerized workloads.
+  use-case: container
+  score_override: 2.0
+
+- revision: v1
+  cves:
+    - CVE-2024-91234
+  dists:
+    - '1592.10'
+  is_resolved: false
+  triaged: false
+
+
+- revision: v1
+  cves:
+    - CVE-2025-11111
+  dists:
+    - '1592.1'
+    - '1592.2'
+  is_resolved: false
+  triaged: true
+  description: |
+    This CVE affects only VM images with cloud-init enabled.
+    Not exploitable in containerized workloads.
+  use-case: cloud
+  ignored: false
+
+- revision: v1
+  cves:
+    - CVE-2025-22222
+  dists:
+    - '1592.1'
+  is_resolved: true
+  triaged: true
+  description: |
+    Patched in kernel version 6.7.0-1gl1.
+  use-case: kernel
+  patch: https://salsa.debian.org/kernel-team/linux/-/commit/xyz789
+  patched_version: '6.7.0-1gl1'
+
+- revision: v1
+  cves:
+    - CVE-2025-33333
+  dists:
+    - '1592.2'
   is_resolved: false
   triaged: false
   description: |
-    This CVE only affects the postgresql server component which is not part of Garden Linux.
+    Affects only bare metal installations.
+  use-case: metal
 
-    This is a multi line string, it may use *Markdown*.
-
-    There may be empty lines, but make sure the multi line string is properly formatted.
-    See https://yaml-multiline.info for syntax info.
-
-- format: v1alpha1
+- revision: v1
   cves:
-    - CVE-2024-10978
-    - CVE-2024-53051
+    - CVE-2025-44444
   dists:
-    - today
+    - '1592.2'
+  is_resolved: false
+  triaged: true
+  description: |
+    This CVE is not relevant for VM images as the vulnerable component is not installed.
+  use-case: cloud
+  ignored: true
