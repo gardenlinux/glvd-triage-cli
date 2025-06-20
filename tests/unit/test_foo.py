@@ -1,6 +1,9 @@
 import pytest
 
-from cli import parse_yaml
+from cli import parse_yaml_file
 
 def test_placeholder():
-    assert len(parse_yaml("tests/unit/sample.yaml")) == 14
+    actual = parse_yaml_file("tests/unit/sample.yaml")
+    assert actual[0]['is_resolved'] == False
+    assert actual[0]['cves'][0] == 'CVE-2024-12345'
+    assert len(actual) == 14

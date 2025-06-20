@@ -1,93 +1,105 @@
 import yaml
-import json
-import os
-import os.path
+import psycopg2
+from psycopg2.extras import execute_values
 
-dist_id_mapping = {}
+import argparse
 
-
-
-# Default values for optional fields
-DEFAULTS = {
-    "is_resolved": False,
-    "triaged": False,
-    "ignored": False,
-    "scope": None,
-    "descriptor": None,
-    "score_override": None,
-    "name": None,
-    "reason": None,
-    "version": None,
-    "gl_version": None,
-    "description": None,
+DB_CONFIG = {
+    "host": "localhost",
+    "port": 5432,
+    "dbname": "glvd",
+    "user": "glvduser",
+    "password": "yourpassword"
 }
 
-def parse_yaml(file_path):
-    """
-    Parses a YAML file and applies default values for optional fields.
+TABLE_SCHEMA = """
+CREATE TABLE IF NOT EXISTS cve_context (
+    id SERIAL PRIMARY KEY,
+    revision TEXT NOT NULL,
+    cve TEXT NOT NULL,
+    dist TEXT NOT NULL,
+    is_resolved BOOLEAN NOT NULL,
+    triaged BOOLEAN NOT NULL,
+    description TEXT,
+    use_case TEXT,
+    score_override FLOAT,
+    ignored BOOLEAN,
+    patch TEXT,
+    patched_version TEXT,
+    name TEXT,
+    reason TEXT,
+    scope TEXT,
+    version TEXT,
+    gl_version TEXT
+);
+"""
 
-    Args:
-        file_path (str): Path to the YAML file.
-
-    Returns:
-        list: A list of parsed and validated entries.
-    """
-    with open(file_path, "r") as file:
-        data = yaml.safe_load(file)
-
+def parse_yaml_file(filepath):
+    with open(filepath, "r") as f:
+        data = yaml.safe_load(f)
     if not isinstance(data, list):
-        raise ValueError("The YAML file must contain a list of entries.")
+        raise ValueError("YAML root must be a list")
+    return data
 
-    parsed_entries = []
-    for entry in data:
-        if not isinstance(entry, dict):
-            raise ValueError("Each entry in the YAML file must be a dictionary.")
-
-        # Validate required fields
-        for required_field in ["revision", "cves", "dists"]:
-            if required_field not in entry:
-                raise ValueError(f"Missing required field: {required_field}")
-
-        # Apply default values for optional fields
-        parsed_entry = {key: entry.get(key, DEFAULTS.get(key)) for key in DEFAULTS}
-        parsed_entry.update({key: entry[key] for key in entry if key not in DEFAULTS})
-
-        # Validate specific fields
-        if parsed_entry["revision"] != "v1":
-            raise ValueError(f"Unsupported revision: {parsed_entry['revision']}")
-        if not isinstance(parsed_entry["cves"], list) or not all(isinstance(cve, str) for cve in parsed_entry["cves"]):
-            raise ValueError("The 'cves' field must be a list of strings.")
-        if not isinstance(parsed_entry["dists"], list) or not all(isinstance(dist, str) for dist in parsed_entry["dists"]):
-            raise ValueError("The 'dists' field must be a list of strings.")
-
-        parsed_entries.append(parsed_entry)
-
-    return parsed_entries
-
-
-def main():
-    with open('dist_cpe.json') as dist:
-        dist_id_mapping = json.loads(dist.read())
-
-    file = f"/data/{os.environ['GLVD_TRIAGE_FILE']}"
-    if not os.path.isfile(file):
-        raise Exception(f"{file} is not a file")
-    items = yaml.load(open(file), Loader=yaml.FullLoader)
-
-    for item in items:
-        dists = item['dists']
+def to_db_rows(entry):
+    cves = entry.get("cves", [])
+    dists = entry.get("dists", [])
+    if not cves or not dists:
+        cves = cves or [None]
+        dists = dists or [None]
+    rows = []
+    for cve in cves:
         for dist in dists:
-            dist_id = dist_id_mapping[dist]
+            rows.append((
+                entry.get("revision"),
+                cve,
+                dist,
+                entry.get("is_resolved", False),
+                entry.get("triaged", False),
+                entry.get("description"),
+                entry.get("use-case"),
+                entry.get("score_override"),
+                entry.get("ignored", False),
+                entry.get("patch"),
+                entry.get("patched_version"),
+                entry.get("name"),
+                entry.get("reason"),
+                entry.get("scope"),
+                entry.get("version"),
+                entry.get("gl_version"),
+            ))
+    return rows
 
-            cves = item['cves']
-            for cve in cves:
-                descriptor = item.get('descriptor', 'GARDENER')
-                description = item.get('description', 'not provided')
-                is_resolved = str(item.get('is_resolved', 'false')).lower()
-                score_override = item.get('score_override', 'NULL')
-                stmt = f"INSERT INTO public.cve_context (dist_id, cve_id, context_descriptor, score_override, description, is_resolved) VALUES('{dist_id}', '{cve}', '{descriptor}', {score_override}, '{description}', {is_resolved});"
+def main(yaml_path, dry_run=False):
+    entries = parse_yaml_file(yaml_path)
+    all_rows = []
+    for entry in entries:
+        all_rows.extend(to_db_rows(entry))
 
-                print(stmt)
+    if dry_run:
+        print(f"DRY RUN: Would insert {len(all_rows)} rows into cve_context table.")
+        for row in all_rows:
+            print(row)
+        return
+
+    conn = psycopg2.connect(**DB_CONFIG)
+    with conn:
+        with conn.cursor() as cur:
+            cur.execute(TABLE_SCHEMA)
+            insert_sql = """
+                INSERT INTO cve_context (
+                    revision, cve, dist, is_resolved, triaged, description,
+                    use_case, score_override, ignored, patch, patched_version,
+                    name, reason, scope, version, gl_version
+                ) VALUES %s
+                ON CONFLICT DO NOTHING
+            """
+            execute_values(cur, insert_sql, all_rows)
+    print(f"Inserted {len(all_rows)} rows into cve_context table.")
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Parse triage YAML and store in Postgres.")
+    parser.add_argument("yaml_file", help="Path to triage YAML file")
+    parser.add_argument("--dry-run", action="store_true", help="Print rows instead of writing to DB")
+    args = parser.parse_args()
+    main(args.yaml_file, dry_run=args.dry_run)
