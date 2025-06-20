@@ -8,12 +8,12 @@ DB_CONFIG = {
     "host": "localhost",
     "port": 5432,
     "dbname": "glvd",
-    "user": "glvduser",
-    "password": "yourpassword"
+    "user": "glvd",
+    "password": "glvd"
 }
 
 TABLE_SCHEMA = """
-CREATE TABLE IF NOT EXISTS cve_context (
+CREATE TABLE IF NOT EXISTS cve_context2 (
     id SERIAL PRIMARY KEY,
     revision TEXT NOT NULL,
     cve TEXT NOT NULL,
@@ -77,7 +77,7 @@ def main(yaml_path, dry_run=False):
         all_rows.extend(to_db_rows(entry))
 
     if dry_run:
-        print(f"DRY RUN: Would insert {len(all_rows)} rows into cve_context table.")
+        print(f"DRY RUN: Would insert {len(all_rows)} rows into cve_context2 table.")
         for row in all_rows:
             print(row)
         return
@@ -87,7 +87,7 @@ def main(yaml_path, dry_run=False):
         with conn.cursor() as cur:
             cur.execute(TABLE_SCHEMA)
             insert_sql = """
-                INSERT INTO cve_context (
+                INSERT INTO cve_context2 (
                     revision, cve, dist, is_resolved, triaged, description,
                     use_case, score_override, ignored, patch, patched_version,
                     name, reason, scope, version, gl_version
@@ -95,7 +95,7 @@ def main(yaml_path, dry_run=False):
                 ON CONFLICT DO NOTHING
             """
             execute_values(cur, insert_sql, all_rows)
-    print(f"Inserted {len(all_rows)} rows into cve_context table.")
+    print(f"Inserted {len(all_rows)} rows into cve_context2 table.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parse triage YAML and store in Postgres.")

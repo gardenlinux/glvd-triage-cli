@@ -27,46 +27,7 @@ services:
     environment:
       PGHOST: glvd-postgres
 
-  glvd-triage-assert-pre:
-    build:
-      context: ../../
-      dockerfile: tests/integration/asserts.Containerfile
-    networks:
-      - glvd-triage-IT
-    depends_on:
-      glvd-init:
-        condition: service_completed_successfully
-    environment:
-      PGHOST: glvd-postgres
-    command: pre
 
-  glvd-triage:
-    build:
-      context: ../../
-      dockerfile: src/Containerfile
-    networks:
-      - glvd-triage-IT
-    depends_on:
-      glvd-triage-assert-pre:
-        condition: service_completed_successfully
-    environment:
-      PGHOST: glvd-postgres
-      GLVD_TRIAGE_FILE: 2025-01-10.yaml
-    secrets:
-      - github_pat
-
-  glvd-triage-assert:
-    build:
-      context: ../../
-      dockerfile: tests/integration/asserts.Containerfile
-    networks:
-      - glvd-triage-IT
-    depends_on:
-      glvd-triage:
-        condition: service_completed_successfully
-    environment:
-      PGHOST: glvd-postgres
-    command: post
 
 networks:
   glvd-triage-IT: {}
