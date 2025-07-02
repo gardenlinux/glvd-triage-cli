@@ -1,7 +1,5 @@
 #!/bin/bash
 
-ENV GLVD_TRIAGE_DIRECTORY
-
 echo "$PGHOST:$PGPORT:$PGDATABASE:$PGUSER:$PGPASSWORD" > ~/.pgpass
 chmod 0600 ~/.pgpass
 

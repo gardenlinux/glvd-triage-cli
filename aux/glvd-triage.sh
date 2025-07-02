@@ -13,7 +13,7 @@ usage() {
     echo "    Be sure to set the KUBECONFIG environment variable accordingly."
     echo "  - This script requires a github personal access token with read access to https://github.com/gardenlinux/glvd-triage-data"
     echo ""
-    echo "Usage: $SCRIPT_NAME my-triage-file.yaml my-github-pat"
+    echo "Usage: $SCRIPT_NAME path/to/triage/files my-github-pat"
     echo ""
     exit 1
 }
@@ -22,7 +22,7 @@ main() {
     [[ $# -ge 2 ]] || usage
     [[ -n "$1" ]] || usage
     [[ -n "$2" ]] || usage
-    local triage_file="${1}"; shift
+    local triage_dir="${1}"; shift
     local github_pat="${1}"; shift
 
     echo "Test if glvd-database-0 exists"
@@ -37,7 +37,7 @@ main() {
      --restart=Never \
      --env=PGHOST=glvd-database-0.glvd-database \
      --env=PGPASSWORD="$(kubectl get secret/postgres-credentials --template="{{.data.password}}" | base64 -d)" \
-     --env=GLVD_TRIAGE_FILE="$triage_file" \
+     --env=GLVD_TRIAGE_DIR="$triage_dir" \
      --env=PAT="$github_pat"
 }
 
