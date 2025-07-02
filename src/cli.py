@@ -4,13 +4,14 @@ from psycopg2.extras import execute_values
 import urllib.request
 
 import argparse
+import os
 
 DB_CONFIG = {
-    "host": "localhost",
-    "port": 5432,
-    "dbname": "glvd",
-    "user": "glvd",
-    "password": "glvd"
+    "host": os.environ.get("PGHOST", "localhost"),
+    "port": int(os.environ.get("PGPORT", 5432)),
+    "dbname": os.environ.get("PGDATABASE", "glvd"),
+    "user": os.environ.get("PGUSER", "glvd"),
+    "password": os.environ.get("PGPASSWORD", "glvd")
 }
 
 gl_version_to_dist_id_mapping = {}
