@@ -34,5 +34,21 @@ services:
         condition: service_healthy
         restart: false
 
+  assert:
+    build:
+      dockerfile: tests/integration/assert.Containerfile
+    environment:
+      PGHOST: glvd-postgres
+      PGPORT: 5432
+      PGDATABASE: glvd
+      PGUSER: glvd
+      PGPASSWORD: glvd
+    networks:
+      - glvd-triage-IT
+    depends_on:
+      ingestion:
+        condition: service_completed_successfully
+        restart: false
+
 networks:
   glvd-triage-IT: {}
