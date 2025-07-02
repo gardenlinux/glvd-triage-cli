@@ -1,6 +1,7 @@
 services:
   glvd-postgres:
-    image: ghcr.io/gardenlinux/glvd-postgres:latest
+    build:
+      dockerfile: tests/integration/postgres-image-for-tests/Containerfile
     hostname: glvd-postgres
     networks:
       - glvd-triage-IT
@@ -17,21 +18,21 @@ services:
       start_period: 30s
       timeout: 10s
 
-  glvd-init:
-    image: ghcr.io/gardenlinux/glvd-init:latest
+  ingestion:
+    build:
+      dockerfile: tests/integration/Containerfile
+    environment:
+      PGHOST: glvd-postgres
+      PGPORT: 5432
+      PGDATABASE: glvd
+      PGUSER: glvd
+      PGPASSWORD: glvd
     networks:
       - glvd-triage-IT
     depends_on:
       glvd-postgres:
         condition: service_healthy
-    environment:
-      PGHOST: glvd-postgres
-
-
+        restart: false
 
 networks:
   glvd-triage-IT: {}
-
-secrets:
-  github_pat:
-    file: ../../github-pat.txt

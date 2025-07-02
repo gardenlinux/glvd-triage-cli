@@ -6,13 +6,11 @@ ENV PGDATABASE glvd
 ENV PGUSER glvd
 ENV PGPASSWORD glvd
 
-ENV GLVD_TRIAGE_FILE sample.yaml
-
-ENV PAT NOT_SET
-
 RUN apt-get update && apt-get install -y postgresql-client curl python3-yaml python3-psycopg2 git
 
-COPY src/cli.py /cli.py
-COPY src/entrypoint.sh /entrypoint.sh
+RUN mkdir /testdata
 
-ENTRYPOINT ["/entrypoint.sh"]
+COPY src/cli.py /cli.py
+COPY tests/integration/integration-test-data.yaml /testdata
+
+ENTRYPOINT ["python3", "/cli.py", "/testdata"]

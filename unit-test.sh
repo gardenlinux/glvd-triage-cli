@@ -1,3 +1,3 @@
 #!/bin/bash
 
-PYTHONPATH=src pytest tests/unit/
+PYTHONPATH=src pytest -vvv tests/unit/

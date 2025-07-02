@@ -20,10 +20,11 @@ def parse_yaml_file(filepath):
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
     if not isinstance(data, list):
-        raise ValueError("YAML root must be a list")
+        print(f"Error in {filepath}: YAML root must be a list")
+        return {}
     return data
 
-def to_db_rows(entry):
+def to_db_rows_v1(entry):
     cves = entry.get("cves", [])
     dists = entry.get("dists", [])
     if not cves or not dists:
@@ -31,29 +32,48 @@ def to_db_rows(entry):
         dists = dists or [None]
     rows = []
     for cve in cves:
+        # Ignore non-CVE entries for now as GLVD does not support anything else
+        if not str.startswith(cve, 'CVE-'):
+            continue
         for dist in dists:
+            print(dist)
+            print(gl_version_to_dist_id_mapping)
             dist_id = gl_version_to_dist_id_mapping.get(dist, -1)
-            if dist_id == -1:
-                dist_id = int(urllib.request.urlopen(f"https://glvd.ingress.glvd.gardnlinux.shoot.canary.k8s-hana.ondemand.com/v1/distro/{dist}/distId").read().decode("utf-8"))
-                gl_version_to_dist_id_mapping[dist] = dist_id
+            
+            try:
+                if dist_id == -1:
+                    dist_id = int(urllib.request.urlopen(f"https://glvd.ingress.glvd.gardnlinux.shoot.canary.k8s-hana.ondemand.com/v1/distro/{dist}/distId").read().decode("utf-8"))
+                    gl_version_to_dist_id_mapping[dist] = dist_id
 
-            rows.append((
-                dist_id,
-                dist,
-                cve,
-                entry.get("use_case"),
-                entry.get("score_override"),
-                entry.get("description"),
-                entry.get("is_resolved", False),
-                entry.get("triaged", False)
-            ))
+                rows.append((
+                    dist_id,
+                    dist,
+                    cve,
+                    entry.get("use_case", "all"),
+                    entry.get("score_override"),
+                    entry.get("description"),
+                    entry.get("is_resolved", False),
+                    entry.get("triaged", False)
+                ))
+            except:
+                print(f"Can't resolve dist {dist}, skipping entry")
     return rows
 
-def main(yaml_path, dry_run=False):
-    entries = parse_yaml_file(yaml_path)
+def main(yaml_dir, dry_run=False):
+    yaml_files = []
+    for root, dirs, files in os.walk(yaml_dir):
+        for file in files:
+            if file.endswith(".yaml") or file.endswith(".yml"):
+                yaml_files.append(os.path.join(root, file))
     all_rows = []
-    for entry in entries:
-        all_rows.extend(to_db_rows(entry))
+    for yaml_path in yaml_files:
+        entries = parse_yaml_file(yaml_path)
+        for entry in entries:
+            if entry.get('revision', 'v0') == 'v1':
+                print(entry)
+                all_rows.extend(to_db_rows_v1(entry))
+            else:
+                print(f'revision {entry.get('revision', 'v0')} is not implemented')
 
     if dry_run:
         print(f"DRY RUN: Would insert {len(all_rows)} rows into public.cve_context table.")
@@ -74,8 +94,8 @@ def main(yaml_path, dry_run=False):
     print(f"Inserted {len(all_rows)} rows into public.cve_context table.")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Parse triage YAML and store in Postgres.")
-    parser.add_argument("yaml_file", help="Path to triage YAML file")
+    parser = argparse.ArgumentParser(description="Parse triage YAML files in a directory and store in Postgres.")
+    parser.add_argument("yaml_dir", help="Path to directory containing triage YAML files")
     parser.add_argument("--dry-run", action="store_true", help="Print rows instead of writing to DB")
     args = parser.parse_args()
-    main(args.yaml_file, dry_run=args.dry_run)
+    main(args.yaml_dir, dry_run=args.dry_run)
