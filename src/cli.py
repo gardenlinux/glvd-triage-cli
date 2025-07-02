@@ -1,6 +1,7 @@
 import yaml
 import psycopg2
 from psycopg2.extras import execute_values
+import urllib.request
 
 import argparse
 
@@ -12,27 +13,7 @@ DB_CONFIG = {
     "password": "glvd"
 }
 
-TABLE_SCHEMA = """
-CREATE TABLE IF NOT EXISTS cve_context2 (
-    id SERIAL PRIMARY KEY,
-    revision TEXT NOT NULL,
-    cve TEXT NOT NULL,
-    dist TEXT NOT NULL,
-    is_resolved BOOLEAN NOT NULL,
-    triaged BOOLEAN NOT NULL,
-    description TEXT,
-    use_case TEXT,
-    score_override FLOAT,
-    ignored BOOLEAN,
-    patch TEXT,
-    patched_version TEXT,
-    name TEXT,
-    reason TEXT,
-    scope TEXT,
-    version TEXT,
-    gl_version TEXT
-);
-"""
+gl_version_to_dist_id_mapping = {}
 
 def parse_yaml_file(filepath):
     with open(filepath, "r") as f:
@@ -50,23 +31,20 @@ def to_db_rows(entry):
     rows = []
     for cve in cves:
         for dist in dists:
+            dist_id = gl_version_to_dist_id_mapping.get(dist, -1)
+            if dist_id == -1:
+                dist_id = int(urllib.request.urlopen(f"https://glvd.ingress.glvd.gardnlinux.shoot.canary.k8s-hana.ondemand.com/v1/distro/{dist}/distId").read().decode("utf-8"))
+                gl_version_to_dist_id_mapping[dist] = dist_id
+
             rows.append((
-                entry.get("revision"),
-                cve,
+                dist_id,
                 dist,
-                entry.get("is_resolved", False),
-                entry.get("triaged", False),
-                entry.get("description"),
-                entry.get("use-case"),
+                cve,
+                entry.get("use_case"),
                 entry.get("score_override"),
-                entry.get("ignored", False),
-                entry.get("patch"),
-                entry.get("patched_version"),
-                entry.get("name"),
-                entry.get("reason"),
-                entry.get("scope"),
-                entry.get("version"),
-                entry.get("gl_version"),
+                entry.get("description"),
+                entry.get("is_resolved", False),
+                entry.get("triaged", False)
             ))
     return rows
 
@@ -77,7 +55,7 @@ def main(yaml_path, dry_run=False):
         all_rows.extend(to_db_rows(entry))
 
     if dry_run:
-        print(f"DRY RUN: Would insert {len(all_rows)} rows into cve_context2 table.")
+        print(f"DRY RUN: Would insert {len(all_rows)} rows into public.cve_context table.")
         for row in all_rows:
             print(row)
         return
@@ -85,17 +63,14 @@ def main(yaml_path, dry_run=False):
     conn = psycopg2.connect(**DB_CONFIG)
     with conn:
         with conn.cursor() as cur:
-            cur.execute(TABLE_SCHEMA)
             insert_sql = """
-                INSERT INTO cve_context2 (
-                    revision, cve, dist, is_resolved, triaged, description,
-                    use_case, score_override, ignored, patch, patched_version,
-                    name, reason, scope, version, gl_version
+                INSERT INTO public.cve_context (
+                    dist_id, gardenlinux_version, cve_id, use_case, score_override, description, is_resolved, triaged
                 ) VALUES %s
                 ON CONFLICT DO NOTHING
             """
             execute_values(cur, insert_sql, all_rows)
-    print(f"Inserted {len(all_rows)} rows into cve_context2 table.")
+    print(f"Inserted {len(all_rows)} rows into public.cve_context table.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parse triage YAML and store in Postgres.")

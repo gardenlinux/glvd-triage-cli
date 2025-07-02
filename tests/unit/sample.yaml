@@ -16,7 +16,7 @@
   triaged: true
   description: |
     Patched in version 5.10.0-25. See Debian security tracker for details.
-  use-case: container
+  use_case: container
   score_override: 5.2
   patch: https://salsa.debian.org/kernel-team/linux/-/commit/abc123
   patched_version: '5.10.0-25'
@@ -30,7 +30,7 @@
   triaged: true
   description: |
     False positive: This CVE affects the PostgreSQL server, which is not included in this image.
-  use-case: container
+  use_case: container
   ignored: true
 
 - revision: v1
@@ -52,7 +52,7 @@
   triaged: true
   description: |
     Perl vulnerability, mitigated by container isolation.
-  use-case: container
+  use_case: container
   score_override: 3.1
 
 - revision: v1
@@ -64,7 +64,7 @@
   triaged: true
   description: |
     Kernel patched in 1592.10.
-  use-case: kernel
+  use_case: kernel
   patch: https://salsa.debian.org/kernel-team/linux/-/commit/def456
   patched_version: '6.6.67-1gl0'
 
@@ -85,7 +85,7 @@
   triaged: true
   description: |
     Perl module CVE, not loaded in this container image.
-  use-case: container
+  use_case: container
   ignored: true
 
 - revision: v1
@@ -98,7 +98,7 @@
   triaged: true
   description: |
     Kernel CVE, not exploitable in containerized workloads.
-  use-case: container
+  use_case: container
   score_override: 2.0
 
 - revision: v1
@@ -121,7 +121,7 @@
   description: |
     This CVE affects only VM images with cloud-init enabled.
     Not exploitable in containerized workloads.
-  use-case: cloud
+  use_case: cloud
   ignored: false
 
 - revision: v1
@@ -133,7 +133,7 @@
   triaged: true
   description: |
     Patched in kernel version 6.7.0-1gl1.
-  use-case: kernel
+  use_case: kernel
   patch: https://salsa.debian.org/kernel-team/linux/-/commit/xyz789
   patched_version: '6.7.0-1gl1'
 
@@ -146,7 +146,7 @@
   triaged: false
   description: |
     Affects only bare metal installations.
-  use-case: metal
+  use_case: metal
 
 - revision: v1
   cves:
@@ -157,5 +157,5 @@
   triaged: true
   description: |
     This CVE is not relevant for VM images as the vulnerable component is not installed.
-  use-case: cloud
+  use_case: cloud
   ignored: true

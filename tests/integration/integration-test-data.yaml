@@ -1,0 +1,61 @@
+- revision: v1
+  cves:
+      - CVE-2023-50387
+  dists:
+      - 'today'
+  is_resolved: true
+  triaged: false
+  description: |
+      automated dummy data
+  use_case: gardener
+  ignored: false
+
+- revision: v1
+  cves:
+      - CVE-2025-0938
+  dists:
+      - '1592.5'
+  is_resolved: true
+  triaged: false
+  description: |
+      Unit test for https://github.com/gardenlinux/glvd/issues/141
+  use_case: all
+  ignored: false
+
+- revision: v1
+  cves:
+      - CVE-2024-11053
+  dists:
+      - '1592.5'
+  is_resolved: false
+  triaged: false
+  description: |
+      #### Vulnerability Description:
+      A potential buffer overflow was identified in the `curl` library that could allow a malicious server to craft a response causing arbitrary code execution. This vulnerability occurs when certain functions do not adequately check the length of data being processed during an HTTP response header parsing operation. If exploited, this could lead to severe system compromise.
+
+      #### False Positive Reasoning:
+      This issue might be flagged as a vulnerability even when using a patched version of `curl`, as some vulnerability scanners rely on version strings rather than actual behavior. For example, a patched `curl` version running on a backported Linux distribution might still report the version as vulnerable. Moreover, if features that rely on the affected codepath (e.g., HTTP) are disabled at compile-time, the vulnerability is not exploitable.
+
+      #### Additional Comments:
+      Another potential false positive arises when software dynamically links against `libcurl`, and only specific binaries trigger the vulnerable behavior. If the primary application does not invoke the affected API calls, the flagged vulnerability is functionally irrelevant. Verifying usage paths and runtime configuration can often clear up the status.
+  use_case: gardener
+  ignored: false
+
+- revision: v1
+  cves:
+      - CVE-2024-12085
+  dists:
+      - '1592.5'
+  is_resolved: false
+  triaged: false
+  description: |
+      #### Vulnerability Description:
+      A critical flaw was discovered in `rsync` that relates to improper validation of symbolic links when handling file synchronization from remote sources. This vulnerability could allow a malicious actor to exploit directory traversal and overwrite critical system files. The attack is particularly concerning when rsync is used in daemon mode with insufficient sanitization.
+
+      #### False Positive Reasoning:
+      This vulnerability may appear as a false positive in configurations where strict chroot and privilege separation are enforced. For example, environments where access controls are properly implemented in the `rsyncd.conf` file might mitigate the risk entirely. Additionally, users often operate `rsync` with `--safe-links`, which disallows following unsafe symbolic links, negating the potential exploitation.
+
+      #### Additional Comments:
+      Another contributing factor to false positives is the presence of mitigations at the kernel or file system level. Systems that enforce AppArmor or SELinux policies restricting file write permissions from external processes might render the reported issue non-exploitable. Testing the setup under actual conditions can often help determine its true relevance.
+  use_case: gardener
+  ignored: false
