@@ -17,13 +17,12 @@ jobs:
 
   integration-tests:
     runs-on: ubuntu-24.04
-    # This is a workaround because the compose setup won't terminate due to the postgres service running forever
-    timeout-minutes: 3
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
-
-      - run: docker compose --file integration-test-compose.yaml up
+      
+      # This is a workaround because the compose setup won't terminate due to the postgres service running forever
+      - run: timeout --preserve-status 3m docker compose --file integration-test-compose.yaml up
 
   unit-tests:
     runs-on: ubuntu-24.04
