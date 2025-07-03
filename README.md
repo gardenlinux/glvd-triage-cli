@@ -6,11 +6,11 @@ Data is maintained [here](https://github.com/gardenlinux/glvd-triage-data) in ya
 
 ## usage
 
-Download the [glvd-triage.sh script](https://raw.githubusercontent.com/gardenlinux/glvd-triage-cli/refs/heads/main/glvd-triage.sh), for example like this:
+Download the [glvd-triage.sh script](https://raw.githubusercontent.com/gardenlinux/glvd-triage-cli/refs/heads/main/aux/glvd-triage.sh), for example like this:
 
 ```bash
 mkdir -p ~/bin
-wget --output-document ~/bin/glvd-triage https://raw.githubusercontent.com/gardenlinux/glvd-triage-cli/refs/heads/main/glvd-triage.sh
+wget --output-document ~/bin/glvd-triage https://raw.githubusercontent.com/gardenlinux/glvd-triage-cli/refs/heads/main/aux/glvd-triage.sh
 chmod +x ~/bin/glvd-triage
 ```
 
@@ -23,4 +23,3 @@ To run the tests:
 
 * Setup podman compose to use the `docker-compose` binary
 * Create a (gitignored) `github-pat.txt` file in this directory and put your own PAT there
-* Run `test.sh`

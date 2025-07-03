@@ -1,6 +1,9 @@
 #!/bin/bash
 set -euo pipefail
 
+# This script is more complex than it should be because docker-compose does not seem to support
+# shutting down the postgres service once the others are done.
+
 COMPOSE_FILE="integration-test-compose.yaml"
 ENGINE="podman"
 
