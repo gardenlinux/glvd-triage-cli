@@ -12,8 +12,13 @@ if [[ $PAT == "NOT_SET" ]]; then
     fi
 fi
 
+if [[ $GLVD_TRIAGE_DIRECTORY == "NOT_SET" ]]; then
+    echo GLVD_TRIAGE_DIRECTORY not set.
+    exit 1
+fi
+
 git clone --depth=1 https://"$PAT"@github.com/gardenlinux/glvd-triage-data /data/
 
-python3 /cli.py "$GLVD_TRIAGE_DIRECTORY"
+python3 /cli.py "/data/$GLVD_TRIAGE_DIRECTORY"
 
 psql -c "select * from public.cve_context where create_date > now() - interval '1 day';" glvd

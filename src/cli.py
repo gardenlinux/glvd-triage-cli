@@ -7,7 +7,7 @@ import argparse
 import os
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("glvd-triage-cli")
 logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
 
 DB_CONFIG = {
@@ -24,11 +24,32 @@ def parse_yaml_file(filepath):
     with open(filepath, "r") as f:
         data = yaml.safe_load(f)
     if not isinstance(data, list):
-        print(f"Error in {filepath}: YAML root must be a list")
+        logger.warning(f"Error in {filepath}: YAML root must be a list")
         return {}
     return data
 
-def to_db_rows_v1(entry):
+
+def gardenlinux_version_to_distId_resolver(gardenlinux_version):
+    url = f"https://glvd.ingress.glvd.gardnlinux.shoot.canary.k8s-hana.ondemand.com/v1/distro/{gardenlinux_version}/distId"
+    try:
+        with urllib.request.urlopen(url, timeout=10) as response:
+            if response.status != 200:
+                logger.error(f"Failed to fetch distId for {gardenlinux_version}: HTTP {response.status}")
+                return -1
+            data = response.read().decode("utf-8")
+            return int(data)
+    except urllib.error.HTTPError as e:
+        logger.error(f"HTTP error while fetching distId for {gardenlinux_version}: {e}")
+    except urllib.error.URLError as e:
+        logger.error(f"URL error while fetching distId for {gardenlinux_version}: {e}")
+    except ValueError as e:
+        logger.error(f"Invalid distId received for {gardenlinux_version}: {e}")
+    except Exception as e:
+        logger.error(f"Unexpected error while fetching distId for {gardenlinux_version}: {e}")
+    return -1
+
+
+def to_db_rows_v1(entry, distId_resolver):
     cves = entry.get("cves", [])
     dists = entry.get("dists", [])
     if not cves or not dists:
@@ -40,13 +61,13 @@ def to_db_rows_v1(entry):
         if not str.startswith(cve, 'CVE-'):
             continue
         for dist in dists:
-            print(dist)
-            print(gl_version_to_dist_id_mapping)
+            logger.debug(f"Processing dist {dist}")
+            logger.debug(f"Current dist to distId mapping {gl_version_to_dist_id_mapping}")
             dist_id = gl_version_to_dist_id_mapping.get(dist, -1)
             
             try:
                 if dist_id == -1:
-                    dist_id = int(urllib.request.urlopen(f"https://glvd.ingress.glvd.gardnlinux.shoot.canary.k8s-hana.ondemand.com/v1/distro/{dist}/distId").read().decode("utf-8"))
+                    dist_id = distId_resolver(dist)
                     gl_version_to_dist_id_mapping[dist] = dist_id
 
                 rows.append((
@@ -60,7 +81,7 @@ def to_db_rows_v1(entry):
                     entry.get("triaged", False)
                 ))
             except:
-                print(f"Can't resolve dist {dist}, skipping entry")
+                logger.warning(f"Can't resolve dist {dist}, skipping entry")
     return rows
 
 def main(yaml_dir, dry_run=False):
@@ -77,14 +98,14 @@ def main(yaml_dir, dry_run=False):
         for entry in entries:
             if entry.get('revision', 'v0') == 'v1':
                 logger.debug(entry)
-                all_rows.extend(to_db_rows_v1(entry))
+                all_rows.extend(to_db_rows_v1(entry, gardenlinux_version_to_distId_resolver))
             else:
-                print(f'revision {entry.get('revision', 'v0')} is not implemented')
+                logger.warning(f'revision {entry.get('revision', 'v0')} is not implemented')
 
     if dry_run:
-        print(f"DRY RUN: Would insert {len(all_rows)} rows into public.cve_context table.")
+        logger.info(f"DRY RUN: Would insert {len(all_rows)} rows into public.cve_context table.")
         for row in all_rows:
-            print(row)
+            logger.info(row)
         return
 
     conn = psycopg2.connect(**DB_CONFIG)
@@ -97,7 +118,7 @@ def main(yaml_dir, dry_run=False):
                 ON CONFLICT DO NOTHING
             """
             execute_values(cur, insert_sql, all_rows)
-    print(f"Inserted {len(all_rows)} rows into public.cve_context table.")
+    logger.info(f"Inserted {len(all_rows)} rows into public.cve_context table.")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Parse triage YAML files in a directory and store in Postgres.")
