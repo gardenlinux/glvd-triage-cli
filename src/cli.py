@@ -6,6 +6,10 @@ import urllib.request
 import argparse
 import os
 
+import logging
+logger = logging.getLogger(__name__)
+logging.basicConfig(encoding='utf-8', level=logging.DEBUG)
+
 DB_CONFIG = {
     "host": os.environ.get("PGHOST", "localhost"),
     "port": int(os.environ.get("PGPORT", 5432)),
@@ -63,14 +67,16 @@ def main(yaml_dir, dry_run=False):
     yaml_files = []
     for root, dirs, files in os.walk(yaml_dir):
         for file in files:
+            logger.debug(f'file: {file}')
             if file.endswith(".yaml") or file.endswith(".yml"):
+                logger.debug(f'file: {os.path.join(root, file)}')
                 yaml_files.append(os.path.join(root, file))
     all_rows = []
     for yaml_path in yaml_files:
         entries = parse_yaml_file(yaml_path)
         for entry in entries:
             if entry.get('revision', 'v0') == 'v1':
-                print(entry)
+                logger.debug(entry)
                 all_rows.extend(to_db_rows_v1(entry))
             else:
                 print(f'revision {entry.get('revision', 'v0')} is not implemented')
@@ -98,4 +104,6 @@ if __name__ == "__main__":
     parser.add_argument("yaml_dir", help="Path to directory containing triage YAML files")
     parser.add_argument("--dry-run", action="store_true", help="Print rows instead of writing to DB")
     args = parser.parse_args()
+    logger.debug(f'yaml_dir: {args.yaml_dir}')
+    logger.debug(f'dry_run: {args.dry_run}')
     main(args.yaml_dir, dry_run=args.dry_run)
