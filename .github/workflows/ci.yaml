@@ -24,12 +24,12 @@ jobs:
       - run: |
           docker compose --file integration-test-compose.yaml up -d
 
-          docker compose wait ingestion assert
+          docker compose --file integration-test-compose.yaml wait ingestion assert
 
           # Get the exit code of the assert service
-          docker compose wait assert
+          docker compose --file integration-test-compose.yaml wait assert
 
-          docker compose down
+          docker compose --file integration-test-compose.yaml down
 
   unit-tests:
     runs-on: ubuntu-24.04
