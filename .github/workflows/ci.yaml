@@ -15,6 +15,16 @@ permissions:
 
 jobs:
 
+  integration-tests:
+    runs-on: ubuntu-24.04
+    # This is a workaround because the compose setup won't terminate due to the postgres service running forever
+    timeout-minutes: 3
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - run: docker podman compose --file integration-test-compose.yaml up
+
   unit-tests:
     runs-on: ubuntu-24.04
     steps:
