@@ -23,7 +23,7 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - run: docker podman compose --file integration-test-compose.yaml up
+      - run: docker compose --file integration-test-compose.yaml up
 
   unit-tests:
     runs-on: ubuntu-24.04
