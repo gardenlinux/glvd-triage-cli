@@ -59,7 +59,7 @@ main() {
      --env=PGHOST=glvd-database-0.glvd-database \
      --env=PGPASSWORD="$(kubectl get secret/postgres-credentials --template="{{.data.password}}" | base64 -d)" \
      --env=GLVD_TRIAGE_DIR="$triage_dir" \
-     --env=PAT="$github_pat" -- bash
+     --env=PAT="$github_pat"
 }
 
 main "$@"
