@@ -17,7 +17,7 @@ if [[ $GLVD_TRIAGE_DIRECTORY == "NOT_SET" ]]; then
     exit 1
 fi
 
-git clone --depth=1 https://"$PAT":x-oauth-basic@github.com/gardenlinux/glvd-triage-data /data/
+git clone --depth=1 https://"$PAT"@github.com/gardenlinux/glvd-triage-data /data/
 
 python3 /cli.py "/data/$GLVD_TRIAGE_DIRECTORY"
 
