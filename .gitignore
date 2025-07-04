@@ -1,1 +1,15 @@
 github-pat.txt
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+.venv
+.pytest_cache
+
+# Logs
+*.log
+
+# Docker
+*.env

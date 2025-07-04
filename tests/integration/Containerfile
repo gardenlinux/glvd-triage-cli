@@ -1,0 +1,16 @@
+FROM docker.io/library/debian:trixie
+
+ENV PGHOST glvd
+ENV PGPORT 5432
+ENV PGDATABASE glvd
+ENV PGUSER glvd
+ENV PGPASSWORD glvd
+
+RUN apt-get update && apt-get install -y postgresql-client curl python3-yaml python3-psycopg2 git
+
+RUN mkdir /testdata
+
+COPY src/cli.py /cli.py
+COPY tests/integration/integration-test-data.yaml /testdata
+
+ENTRYPOINT ["python3", "/cli.py", "/testdata"]

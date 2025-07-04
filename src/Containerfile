@@ -1,0 +1,18 @@
+FROM docker.io/library/debian:trixie
+
+ENV PGHOST glvd
+ENV PGPORT 5432
+ENV PGDATABASE glvd
+ENV PGUSER glvd
+ENV PGPASSWORD glvd
+
+ENV GLVD_TRIAGE_DIRECTORY NOT_SET
+
+ENV PAT NOT_SET
+
+RUN apt-get update && apt-get install -y postgresql-client curl python3-yaml python3-psycopg2 git
+
+COPY src/cli.py /cli.py
+COPY src/entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]
