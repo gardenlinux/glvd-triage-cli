@@ -30,7 +30,7 @@ def parse_yaml_file(filepath):
 
 
 def gardenlinux_version_to_distId_resolver(gardenlinux_version):
-    url = f"https://glvd.ingress.glvd.gardnlinux.shoot.canary.k8s-hana.ondemand.com/v1/distro/{gardenlinux_version}/distId"
+    url = f"https://security.gardenlinux.org/v1/distro/{gardenlinux_version}/distId"
     try:
         with urllib.request.urlopen(url, timeout=10) as response:
             if response.status != 200:
