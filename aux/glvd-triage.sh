@@ -48,16 +48,16 @@ main() {
 
     echo "Test if glvd-database-0 exists"
     echo "We need this, be sure you have the correct kubeconfig set"
-    kubectl get pods glvd-database-0 || usage
+    kubectl --namespace glvd get pods glvd-database-0 || usage
 
     local now
     now="$(date +%s)"
 
-    kubectl run glvd-triage-"$now" \
+    kubectl --namespace glvd run glvd-triage-"$now" \
      --image=ghcr.io/gardenlinux/triage:"$image_tag" \
      --restart=Never \
      --env=PGHOST=glvd-database-0.glvd-database \
-     --env=PGPASSWORD="$(kubectl get secret/postgres-credentials --template="{{.data.password}}" | base64 -d)" \
+     --env=PGPASSWORD="$(kubectl --namespace glvd get secret/postgres-credentials --template="{{.data.password}}" | base64 -d)" \
      --env=GLVD_TRIAGE_DIRECTORY="$triage_dir" \
      --env=PAT="$github_pat"
 }
